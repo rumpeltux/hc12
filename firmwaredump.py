@@ -1,12 +1,27 @@
 #!/usr/bin/env python3
 import serial
-from updatetool import enterUpdateMode
 
 def setBaud(hc, rate):
     hc.write(b'AT+B%d' % rate)
     ok = b'OK+B%d\r\n' % rate
     resp = hc.read(len(ok))
     assert resp == ok, (ok, resp)
+
+def enterUpdateMode(tty):
+    """Enter the firmware update mode."""
+    hc = serial.Serial(tty, 9600, timeout=.1)
+    hc.write(b'AT+UPDATE\n')
+    x = hc.read(40)
+    assert b'OK\r\n' in x, repr(x)
+    time.sleep(.1)
+    hc.write(b'\xEE')
+    hc.close()
+    time.sleep(.00001)
+    hc = serial.Serial(tty, 19200, timeout=.1)
+    hc.write(b'I')
+    x = hc.read(100)
+    assert x == b'\4', repr(x)
+    return hc
 
 DUMPCODE = bytes.fromhex('25008ba093d481ae4200a608c7b235905f90bff47e0f5230fbf67852315c26ef84841701be')
 

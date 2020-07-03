@@ -26,7 +26,8 @@ Receive b bytes to address de via SPI
 # Update procedure
 
 AT+UPDATE
-wait .1s, switch to 19200 baud
+wait .1s (unclear why this works, because there doesn't seem to be a path to the update_handler w/o sending 0xEE, maybe WD reset?)
+switch to 19200 baud
 send 'I'
 
 package contains at most 0x25 bytes
@@ -42,6 +43,13 @@ Length must not be 15.
 
 The reset vector (0x8000 to 0x8003) cannot be overwritten.
 
+## Remove Update procedure
+
+pinSET pullup, wait a bit until regular FU3 is setup
+pinSET down, up, down. Should cause a reset to enter OTA update mode.
+
+Send P + 0x24 bytes update package.
+
 ## Non-essential code locations
 236 8121 820D AT+FU5                                       CODE1
 254 8E4F 8F4C                                              DATA
@@ -56,6 +64,34 @@ sum: 1.4k
 
 location for packet_recv_handler:
 104 93D4 943C uart_tx
+
+## Pinout
+
+https://cxem.net/review/review26.php
+https://twitter.com/cathedrow/status/845044463118553091/photo/1
+
+D4
+D5     TX
+D6     RX
+A1,2   osc
+A3     module ready signal
+
+D3
+D2           NSEL
+D1  SWIM
+C7           MISO
+C6           MOSI
+C5           SCLK
+C4            IRQ
+C3             01
+B4        GPIO 00
+B5            SET
+
+Available: A1,2,3* D1*,3,4*
+A3 signaling chip boot readiness
+D1 SWIM used for programming
+D4 used as output toggles on TX
+D3
 
 ## RFIC Programming Guide
 http://www.farnell.com/datasheets/1889753.pdf
