@@ -43,7 +43,7 @@ package contains at most 0x25 bytes
 
 The reset vector (0x8000 to 0x8003) cannot be overwritten.
 
-## Remove Update procedure
+## Remote Update procedure
 
 * pinSET pullup, wait a bit until regular FU3 is setup
 * pinSET down, up, down. Should cause a reset to enter OTA update mode.

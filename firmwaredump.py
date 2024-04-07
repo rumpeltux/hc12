@@ -23,6 +23,19 @@ def enterUpdateMode(tty):
     assert x == b'\4', repr(x)
     return hc
 
+# DUMPCODE below contains the following
+# raw assembly that will dump the firmware when executed.
+_dump_code = bytes.fromhex(
+    'AE 80 00' # x = 0x8000
+    'A608 C75235' # UART_CR2 = TEN
+    '905F 90BFF4' # tickle watchdog
+    '720F52 30 FB' # while(!(UART_SR & TXE)) ;
+    'F6 C75231' # UART_DR = x
+    '5C' # x++
+    '26EF' # loop
+    '81' # ret
+)
+
 DUMPCODE = bytes.fromhex('25008ba093d481ae4200a608c7b235905f90bff47e0f5230fbf67852315c26ef84841701be')
 
 def dumpFirmware(hc, filename):
