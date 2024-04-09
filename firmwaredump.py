@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import serial
+import time
 
 def setBaud(hc, rate):
     hc.write(b'AT+B%d' % rate)
